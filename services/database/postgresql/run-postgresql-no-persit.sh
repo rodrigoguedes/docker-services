@@ -1,5 +1,5 @@
 docker run \
-  --name postgresql-develop \
+  --name postgresql-no-persist-dev \
   --ulimit memlock=-1:-1 -it --rm=true --memory-swappiness=0 \
   -e POSTGRES_USER="developer" \
   -e POSTGRES_PASSWORD="dev123" \
