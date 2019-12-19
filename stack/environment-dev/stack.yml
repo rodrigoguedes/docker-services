@@ -1,0 +1,54 @@
+version: '3.1'
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks: 
+  stack-dev-network:
+    driver: bridge 
+
+services:
+  db:
+    image: postgres:11.5
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: developer
+      POSTGRES_PASSWORD: dev123
+      POSTGRES_DB: database_dev
+    volumes:
+        - ./scripts:/docker-entrypoint-initdb.d
+        - postgres_data:/var/lib/postgresql/data
+    networks:
+      - stack-dev-network
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8090:8080
+    networks:
+      - stack-dev-network
+    
+
+  keycloak:
+    image: jboss/keycloak
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: db
+      DB_DATABASE: database_dev
+      DB_USER: developer
+      DB_SCHEMA: keycloak
+      DB_PASSWORD: dev123
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: Pa55w0rd
+      # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+      #JDBC_PARAMS: "ssl=true"
+    ports:
+      - 8180:8080
+    depends_on:
+      - db
+    networks:
+      - stack-dev-network
